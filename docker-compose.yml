@@ -1,0 +1,7 @@
+version: "2"
+services:
+  server:
+    build: .
+    command: go run chatApp.go
+    ports:
+      - 9000:9000
