@@ -116,9 +116,9 @@ curl --header "Content-Type: application/json" \
 
 ### Стек
 
-*Go
-*SQLite
-*Docker
+* Go
+* SQLite
+* Docker
 
 ### Запуск
 
