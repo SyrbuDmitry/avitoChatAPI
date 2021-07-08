@@ -124,7 +124,7 @@ curl --header "Content-Type: application/json" \
 
 ```bash
 $ git clone https://github.com/SyrbuDmitry/avitoChatAPI.git
-$ cd /avitoChatAPI
+$ cd ~/avitoChatAPI
 $ docker-compose build
 $ docker-compose up
 ```
