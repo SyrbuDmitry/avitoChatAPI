@@ -99,10 +99,6 @@ func addChat(w http.ResponseWriter, r *http.Request) {
 
 	lastId, _ := ret.LastInsertId()
 
-	if err != nil {
-		respondError(w, err, http.StatusInternalServerError)
-		return
-	}
 	for _, v := range newChat.Users {
 		userId := v
 		_, err := tx.Exec("INSERT INTO chatsJoinUsers (chat_id, user_id) VALUES (?, ?);", lastId, userId)
