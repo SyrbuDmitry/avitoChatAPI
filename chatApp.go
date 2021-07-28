@@ -125,11 +125,38 @@ func addMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ret, err := dbPointer.Exec("INSERT INTO messages (text, chat_id, user_id, createdAt) VALUES (?, ?, ?, ?);", newMessage.Text, newMessage.ChatId, newMessage.UserId, createdAt)
+	userId, chatId := newMessage.UserId, newMessage.ChatId
+
+	var chatCheck int64
+	chatCheckError := dbPointer.QueryRow("SELECT EXISTS (SELECT * FROM chats WHERE id = ?)", chatId).Scan(&chatCheck)
+	if chatCheckError != nil {
+		respondError(w, chatCheckError, http.StatusBadRequest)
+		return
+	}
+
+	if chatCheck == 0 {
+		respondError(w, errors.New("No such chat!"), http.StatusBadRequest)
+		return
+	}
+
+	var userCheck int64
+	userCheckError := dbPointer.QueryRow("SELECT EXISTS (SELECT * FROM chatsJoinUsers WHERE chat_id = ? AND user_id = ?)", chatId, userId).Scan(&userCheck)
+	if userCheckError != nil {
+		respondError(w, userCheckError, http.StatusInternalServerError)
+		return
+	}
+
+	if userCheck == 0 {
+		respondError(w, errors.New("No such user in the chat!"), http.StatusBadRequest)
+		return
+	}
+
+	ret, err := dbPointer.Exec("INSERT INTO messages (text, chat_id, user_id, createdAt) VALUES (?, ?, ?, ?);", newMessage.Text, chatId, userId, createdAt)
 	if err != nil {
 		respondError(w, err, http.StatusInternalServerError)
 		return
 	}
+
 	lastId, _ := ret.LastInsertId()
 
 	response := responseTypes.IdResponse{lastId}
